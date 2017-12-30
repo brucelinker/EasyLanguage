@@ -1,0 +1,30 @@
+
+{
+This code is to be used in the Scanner. It is designed
+to find the stocks that have the largest net move within
+the define Period of bars. It will also skip over any
+stocks that are below the defined average threshold.
+
+The Scanner should test for a non-zero value. You can 
+set a desired minimum amount.
+}
+
+input:
+	Period(8),
+	AvgLength(20),
+	MinAvgVol(10000);
+var:
+	AvgVol(0),
+	NetChg(0);
+
+if BarType >= 2 and BarType < 5 then { Daily, Weekly, or Monthly bars }
+	AvgVol = AverageFC(Volume, AvgLength)
+else 
+	AvgVol = AverageFC(Ticks, AvgLength);
+
+if date = date[Period] and AvgVol > MinAvgVol then
+	NetChg = MaxList(Last - lowestFC(low, Period), highestFC(high, Period) - Last)
+else
+	NetChg = 0;
+	
+Plot1(NetChg, "NetChg");

@@ -1,0 +1,342 @@
+{
+This indicator is designed to be used in the Radarscreen.
+It will show when a stock is bounce up or down through
+a moving average (ema8, ema21, ema34, sma50, or sma200). 
+It will also scan for setups like JHook, Pinball, or 
+2 bars down and 1 bar up, 2 bars up and 1 bar down, etc.
+}
+
+inputs:
+	BGValue(60);
+
+var:
+	ema8(0),
+	ema21(0),
+	ema34(0),
+	sma50(0),
+	sma200(0),
+	Result(0),
+	v8emaFlag(0),
+	v21emaFlag(0),
+	v34emaFlag(0),
+	v50maFlag(0),
+	v200maFlag(0),
+	v2DU1RFlag(0),
+	v2LH1RFlag(0),
+//	vTLineFlag(false),
+	vJHookFlag(0),
+	vPinballFlag(0),
+	AlertLong(false),
+	AlertShort(false),
+	Color(0);
+
+ema8 = xAverage(close, 8);
+ema21 = xAverage(close, 21);
+ema34 = xAverage(close, 34);
+sma50 = AverageFC2(close, 50);
+sma200 = AverageFC2(close, 200);
+
+AlertLong = false;
+AlertShort = false;
+
+v8emaFlag = 0;
+v21emaFlag = 0;
+v34emaFlag = 0;
+v50maFlag = 0;
+v200maFlag = 0;
+v2DU1RFlag = 0;
+v2LH1RFlag = 0;
+//vTLineFlag = false;
+vJHookFlag = 0;
+vPinballFlag = 0;
+
+// 8ema
+if 	(Highest(high[1], 3) > ema8[1] and (close[1] <= ema8[1] or low < ema8)) and 
+	close > close[1] and
+	close > open and
+	(high - close) < ((high - low)*0.5) and  
+	close > ema8 and
+	ema8 >= ema21 then begin
+	Plot1( "8ema", "8ema", green);
+	SetPlotBGColor(1, iff(v8emaFlag[1] = 1, black, rgb(0, BGValue, 0)));
+	v8emaFlag = 1;
+	AlertLong = true;
+end
+else if	(Lowest(low[1], 3) < ema8[1] and (close[1] >= ema8[1] or high > ema8)) and 
+	close < close[1] and
+	close < open and
+	(close - low) < ((high - low)*0.5) and  
+	close < ema8 and
+	ema8 <= ema21 then begin
+	Plot1( "8ema", "8ema", red);
+	SetPlotBGColor(1, iff(v8emaFlag[1] = -1, black, rgb(BGValue,0,0)));
+	v8emaFlag = -1;
+	AlertShort = true;
+end
+else begin
+	v8emaFlag = 0;
+	NoPlot(1);
+end;
+
+// 21ema
+if 	(Highest(high[1], 3) > ema21[1] and (close[1] <= ema21[1] or low < ema21)) and 
+	close > close[1] and
+	close > open and
+	(high - close) < ((high - low)*0.5) and  
+	close > ema21 and
+	ema8 >= ema21 then begin
+	Plot2( "21ema", "21ema", green);
+	SetPlotBGColor(2, iff(v21emaFlag[1] = 1, black, rgb(0, BGValue, 0)));
+	v21emaFlag = 1;
+	AlertLong = true;
+end
+else if	(Lowest(low[1], 3) < ema21[1] and (close[1] >= ema21[1] or high > ema21)) and 
+	close < close[1] and
+	close < open and
+	(close - low) < ((high - low)*0.5) and  
+	close < ema21 and
+	ema8 <= ema21 then begin
+	Plot2( "21ema", "21ema", red);
+	SetPlotBGColor(2, iff(v21emaFlag[1] = -1, black, rgb(BGValue,0,0)));
+	v21emaFlag = -1;
+	AlertShort = true;
+end
+else begin
+	v21emaFlag = 0;
+	NoPlot(2);
+end;
+
+// 34ema
+if 	(Highest(high[1], 3) > ema34[1] and (close[1] <= ema34[1] or low < ema34)) and 
+	close > close[1] and
+	close > open and
+	(high - close) < ((high - low)*0.5) and  
+	close > ema34 and
+	ema21 >= ema34 then begin
+	Plot3( "34ema", "34ema", green);
+	SetPlotBGColor(3, iff(v34emaFlag[1] = 1, black, rgb(0, BGValue, 0)));
+	v34emaFlag = 1;
+	AlertLong = true;
+end
+else if	(Lowest(low[1], 3) < ema34[1] and (close[1] >= ema34[1] or high > ema34)) and 
+	close < close[1] and
+	close < open and
+	(close - low) < ((high - low)*0.5) and  
+	close < ema34 and
+	ema21 <= ema34 then begin
+	Plot3( "34ema", "34ema", red);
+	SetPlotBGColor(3, iff(v34emaFlag[1] = -1, black, rgb(BGValue,0,0)));
+	v34emaFlag = -1;
+	AlertShort = true;
+end
+else begin
+	v34emaFlag = 0;
+	NoPlot(3);
+end;
+
+// 50sma
+if 	(Highest(high[1], 3) > sma50[1] and (close[1] <= sma50[1] or low < sma50)) and 
+	close > close[1] and
+	close > open and
+	(high - close) < ((high - low)*0.5) and  
+	close > sma50 and
+	ema34 >= sma50 then begin
+	Plot4( "50sma", "50sma", green);
+	SetPlotBGColor(4, iff(v50maFlag[1] = 1, black, rgb(0, BGValue, 0)));
+	v50maFlag = 1;
+	AlertLong = true;
+end
+else if	(Lowest(low[1], 3) < sma50[1] and (close[1] >= sma50[1] or high > sma50)) and 
+	close < close[1] and
+	close < open and
+	(close - low) < ((high - low)*0.5) and  
+	close < sma50 and
+	ema34 <= sma50 then begin
+	Plot4( "50sma", "50sma", red);
+	SetPlotBGColor(4, iff(v50maFlag[1] = -1, black, rgb(BGValue,0,0)));
+	v50maFlag = -1;
+	AlertShort = true;
+end
+else begin
+	v50maFlag = 0;
+	NoPlot(4);
+end;
+
+// 200sma
+if 	(Highest(high[1], 3) > sma200[1] and (close[1] <= sma200[1] or low < sma200)) and 
+	close > close[1] and
+	close > open and
+	(high - close) < ((high - low)*0.5) and  
+	close > sma200 and
+	sma50 >= sma200 then begin
+	Plot5( "200sma", "200sma", green);
+	SetPlotBGColor(5, iff(v200maFlag[1] = 1, black, rgb(0, BGValue, 0)));
+	v200maFlag = 1;
+	AlertLong = true;
+end
+else if	(Lowest(low[1], 3) < sma200[1] and (close[1] >= sma200[1] or high > sma200)) and 
+	close < close[1] and
+	close < open and
+	(close - low) < ((high - low)*0.5) and  
+	close < sma200 and
+	sma50 <= sma200 then begin
+	Plot5( "200sma", "200sma", red);
+	SetPlotBGColor(5, iff(v200maFlag[1] = -1, black, rgb(BGValue,0,0)));
+	v200maFlag = -1;
+	AlertShort = true;
+end
+else begin
+	v200maFlag = 0;
+	NoPlot(5);
+end;
+
+// 2 Dn-1 Up
+if close[2] < close[3] and
+	close[1] < close[2] and
+	close > high[1] and
+	ema34 >= sma50 and
+	(high - close) < ((high - low)*0.5) and  
+	close > close[1] and
+	close > open then begin
+	Plot6( "2C-1R", "2C-1R", green);
+	SetPlotBGColor(6, iff(v2DU1RFlag[1] = 1, black, rgb(0, BGValue, 0)));
+	v2DU1RFlag = 1;
+	AlertLong = true;
+end
+else if close[2] > close[3] and
+	close[1] > close[2] and
+	close < low[1] and
+	ema34 <= sma50 and
+	(close - low) < ((high - low)*0.5) and  
+	close < close[1] and
+	close < open then begin
+	Plot6( "2C-1R", "2C-1R", red);
+	SetPlotBGColor(6, iff(v2DU1RFlag[1] = -1, black, rgb(BGValue,0,0)));
+	v2DU1RFlag = -1;
+	AlertShort = true;
+end
+else begin
+	v2DU1RFlag = 0;
+	NoPlot(6);
+end;
+
+// 2 Low/High-1 Up/Dn
+if 	low[2] < low[3] and
+	low[1] < low[2] and
+//	low < low[1] and
+	close > high[1] and
+	ema34 >= sma50 and
+	(high - close) < ((high - low)*0.5) and  
+	close > close[1] and
+	close > open then begin
+	Plot7( "2LH-1R", "2LH-1R", green);
+	SetPlotBGColor(7, iff(v2LH1RFlag[1] = 1, black, rgb(0, BGValue, 0)));
+	v2LH1RFlag = 1;
+	AlertLong = true;
+end
+else if high[2] > high[3] and
+	high[1] > high[2] and
+//	high > high[1] and
+	close < low[1] and
+	ema34 <= sma50 and
+	(close - low) < ((high - low)*0.5) and  
+	close < close[1] and
+	close < open then begin
+	Plot7( "2LH-1R", "2LH-1R", red);
+	SetPlotBGColor(7, iff(v2LH1RFlag[1] = -1, black, rgb(BGValue,0,0)));
+	v2LH1RFlag = -1;
+	AlertShort = true;
+end
+else begin
+	v2LH1RFlag = 0;
+	NoPlot(7);
+end;
+	
+Commentary("low[2] < low[3] ", low[2] < low[3], newline,
+			"low[1] < low[2] ", low[1] < low[2], newline,
+//	low < low[1] and
+			"close > high[1] ", close > high[1], newline,
+			"ema34 >= sma50 ", ema34 >= sma50, newline, 
+			"(high - close) < ((high - low)*0.5) ", (high - close) < ((high - low)*0.5), newline,
+			"close > open ", close > open, newline);
+	
+//Plot8(low[2] < low[3], "1");
+//Plot9(low[1] < low[2], "2");
+//Plot10(close > high[1], "3");
+//Plot11(ema34 >= sma50, "4"); 
+//Plot12((high - close) < ((high - low)*0.5), "5");  
+//Plot13(close > open, "6");
+
+
+{
+// Tline
+if ShowTLineBounce then begin	
+	if close[1] <= ema8[1] and
+		last > ema8 and
+		ema8 >= ema34 and
+		ema34 >= sma50 and
+		last > open then begin
+		Plot8( "X", "TLine", iff(vTLineFlag[1], darkgreen, green));
+		vTLineFlag= true;
+		AlertLong = true;
+	end
+	else if close[1] >= ema8[1] and
+		last < ema8 and
+		ema8 <= ema34 and
+		ema34 <= sma50 and
+		last < open then begin
+		Plot8( "X", "TLine", iff(vTLineFlag[1], darkred, red));
+		vTLineFlag= true;
+		AlertShort = true;
+	end;
+end;
+}
+// JHook
+if ema8 >= ema34 and
+	ema34 >= sma50 and
+	close[1] <= ema8 and
+	last > ema8 and 
+	last > open and 
+	last > high[1] then begin
+	Plot9("JHook", "JHook", iff(vJHookFlag[1] = 1, darkgreen, green));
+	vJHookFlag= 1;
+	AlertLong = true;
+end
+else if ema8 <= ema34 and
+	ema34 <= sma50 and
+	close[1] >= ema8 and
+	last < ema8 and
+	last < open and 
+	last < low[1] then begin
+	Plot9("JHook", "JHook", iff(vJHookFlag[1] = -1, darkred, red));
+	vJHookFlag= -1;
+	AlertShort = true;
+end;
+
+// Pinball
+if ema8 <= ema34 and
+	ema34 <= sma50 and
+	close[1] <= ema8 and
+	last > ema8 and
+	last > open and 
+	last > high[1] then begin
+	Plot10("Pinball", "Pinball", iff(vPinballFlag[1] = 1, darkgreen, green));
+	vPinballFlag= 1;
+	AlertLong = true;
+end
+else if ema8 >= ema34 and
+	ema34 >= sma50 and
+	close[1] >= ema8 and
+	last < ema8 and
+	last < open and 
+	last < low[1] then begin
+	Plot10("Pinball", "Pinball", iff(vPinballFlag[1] = -1, darkred, red));
+	vPinballFlag= -1;
+	AlertShort = true;
+end;
+
+if AlertLong then
+	Alert("Long bounce on " + GetSymbolName);
+
+if AlertShort then
+	Alert("Short bounce on " + GetSymbolName);
